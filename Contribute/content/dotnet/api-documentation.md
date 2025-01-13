@@ -3,7 +3,7 @@ title: How to write /// docs for .NET API ref
 ms.date: 06/29/2023
 author: gewarren
 ms.author: gewarren
-ms.prod: non-product-specific
+ms.service: learn
 ms.topic: contributor-guide
 description: Learn how to write good descriptions in source code for generating .NET API reference documentation.
 ---
@@ -55,13 +55,14 @@ This article provides tips about writing good doc comments *within the source co
 | `<seealso>` | Adds a "See also" link to the specified API. | `<seealso cref="T:System.Single" />` |
 | `<typeparamref>` | Refers to a type parameter. | `The <typeparamref name="THandler" /> is resolved from a scoped service provider.` |
 
-For more information, see [Recommended XML tags for C#](/dotnet/csharp/language-reference/xmldoc/recommended-tags). The [ECMAXML spec](http://docs.go-mono.com/index.aspx?link=man%3amdoc(5)) also has some helpful guidance.
+For more information, see [Recommended XML tags for C#](/dotnet/csharp/language-reference/xmldoc/recommended-tags) and the [C# specification](/dotnet/csharp/language-reference/language-specification/documentation-comments#d2-introduction). The [ECMAXML spec](http://docs.go-mono.com/index.aspx?link=man%3amdoc(5)) also has good information, although be aware that there are some differences between ECMAXML and /// documentation comments (for example, cref targets are fully expanded and have prefixes in ECMAXML).
 
 ## Cross references
 
-When you use a `<see cref>` tag to link to another API, there's no need to add a prefix to the type name, such as `T:` for type or `M:` for method. In fact, code analysis [rule CA1200](/dotnet/fundamentals/code-analysis/quality-rules/ca1200) flags code comments that add a prefix to the type name in a `cref` tag.
+When you use a `<see cref>` tag to link to another API, there's no need to add a prefix to the type name, such as `T:` for type or `M:` for method. In fact, code analysis [rule CA1200](/dotnet/fundamentals/code-analysis/quality-rules/ca1200) flags code comments that add a prefix to the type name in a `cref` tag. However, there are a couple exceptions to this rule:
 
-However, when you want link to the general form of a method that has more than one overload, the C# compiler [doesn't currently support that](https://github.com/dotnet/csharplang/issues/320). The workaround for docs is to prefix the method name with `O:` in source code (or `Overload:` in ECMAXML) and suppress [rule CA1200](/dotnet/fundamentals/code-analysis/quality-rules/ca1200). For example: `<altmember cref="O:System.Diagnostics.Process.Kill" />`.
+- When you want to link to the general form of a method that has more than one overload, the C# compiler [doesn't currently support that](https://github.com/dotnet/csharplang/issues/320). The workaround for docs is to prefix the method name with `O:` in source code (or `Overload:` in ECMAXML) and suppress [rule CA1200](/dotnet/fundamentals/code-analysis/quality-rules/ca1200). For example: `<altmember cref="O:System.Diagnostics.Process.Kill" />`.
+- When the API can't be resolved from the current context, which includes any `using` directives. In this case, use the fully qualified API name with a prefix.
 
 When the `<see cref>` tag is converted to [ECMAXML](http://docs.go-mono.com/index.aspx?link=man%3amdoc(5)), mdoc replaces the type name with the full DocId of the API, which includes a prefix.
 
@@ -86,9 +87,11 @@ If your code example is lengthy, you can put it in a separate file in the docs r
 /// </example>
 ```
 
+For some more details about how to hook up separate code files, see [this discussion](https://github.com/dotnet/runtime/pull/111177#discussion_r1907549328).
+
 ## Language attributes
 
-Language attributes on `<code>` tags are optional, but they cause the code to be formatted correctly/prettily. For example:
+Language attributes on `<code>` tags are optional, but they cause the code to be formatted with color coding. For example:
 
 ```csharp
 /// <example>
@@ -119,3 +122,5 @@ When documenting an API that's not intended to be used by consumers, use wording
 ## See also
 
 - [ECMAXML format](http://docs.go-mono.com/index.aspx?link=man%3amdoc(5))
+- [Recommended XML tags for C#](/dotnet/csharp/language-reference/xmldoc/recommended-tags)
+- [Documentation comments (C# specification)](/dotnet/csharp/language-reference/language-specification/documentation-comments#d2-introduction)
